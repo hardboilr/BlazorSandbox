@@ -1,0 +1,57 @@
+﻿@page "/fetchdata"
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table" id="table-example">
+        <thead>
+            <tr>
+                <th>@nameof(WeatherForecast.UserId)</th>
+                <th>@nameof(WeatherForecast.Id)</th>
+                <th>@nameof(WeatherForecast.Title)</th>
+                <th>@nameof(WeatherForecast.Completed)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in forecasts)
+            {
+                <tr>
+                    <td>@forecast.UserId</td>
+                    <td>@forecast.Id</td>
+                    <td>@forecast.Title</td>
+                    <td>@forecast.Completed</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private WeatherForecast[] forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("https://jsonplaceholder.typicode.com/todos/");
+        await JSRuntime.InvokeAsync<object>("TestDataTablesAdd", "#table-example");
+    }
+
+    public class WeatherForecast
+    {
+        public int UserId { get; set; }
+
+        public int Id { get; set; }
+
+        public string Title { get; set; }
+
+        public bool Completed { get; set; }
+    }
+}
